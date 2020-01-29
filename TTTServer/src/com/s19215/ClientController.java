@@ -37,7 +37,7 @@ public class ClientController implements Runnable {
                         else
                             sendDataToClient("ERROR");
                 }
-                sck.close();
+                killClient();
             } catch (IOException e){
                 killClient();
                 System.out.println("Problem z połączeniem z klientem "+e.getMessage());
@@ -54,7 +54,14 @@ public class ClientController implements Runnable {
         else{
             System.out.println("GRACZ 2 DOSZEDL");
             Game game = new Game(this, rival);
-            game.run();
+            try {
+                game.run();
+            } catch (IOException e){
+                if(!this.sck.isClosed())
+                    sendDataToClient("INTERRUPT");
+                if(!rival.sck.isClosed())
+                    sendDataToClient("INTERRUPT");
+            }
             rival.endWaiting();
         }
     }

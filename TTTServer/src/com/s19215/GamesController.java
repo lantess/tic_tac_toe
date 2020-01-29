@@ -52,7 +52,7 @@ public class GamesController {
     }
 
     public void deleteClient(int id){
-        synchronized (waitingClient){
+        if(waitingClient!=null){
             if(waitingClient.equals(clientList.get(id)))
                 waitingClient = null;
         }

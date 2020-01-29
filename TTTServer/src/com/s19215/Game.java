@@ -7,38 +7,37 @@ import java.net.InetAddress;
 public class Game {
     private static final int EMPTY = 0,
                                 X = 1,
-                                Y = 2;
-    private ClientController firstPlayer,
-                            secondPlayer;
+                                O = 2;
+    private int id;
+    private ClientController[] player;
     private int[][] field;
     private boolean isRunning;
 
     public Game(ClientController clientController, ClientController rival) {
-        firstPlayer = clientController;
-        secondPlayer = rival;
+        player = new ClientController[]{clientController,rival};
         field = new int[3][3];
         isRunning = true;
     }
 
     public void run() throws IOException {
-        ClientController player = Math.random()<0.5 ? firstPlayer : secondPlayer;
+        id = (int)(Math.random()*2);
         while(isRunning){
             sendGameInfoOnUDP();
-            sendInfoAboutTurns(player);
-            String move = player.readDataFromClient();
+            sendInfoAboutTurns();
+            String move = player[id].readDataFromClient();
             if(move.substring(0, 4).equals("MOVE")){
                 int x = Integer.parseInt(""+move.charAt(4)),
                         y = Integer.parseInt(""+move.charAt(5));
                 if(field[x][y]==Game.EMPTY){
-                    field[x][y] = isPlayerFirstPlayer(player) ? Game.X : Game.Y;
+                    field[x][y] = id == 0 ? Game.X : Game.O;
                     int win = checkForVictory();
                     if(win!=Game.EMPTY){
-                        player.sendDataToClient("VICTORY");
-                        swapPlayer(player);
-                        player.sendDataToClient("DEFEAT");
+                        player[id].sendDataToClient("VICTORY");
+                        swapPlayer();
+                        player[id].sendDataToClient("DEFEAT");
                         isRunning = false;
                     } else{
-                        swapPlayer(player);
+                        swapPlayer();
                     }
                 }
             }
@@ -50,7 +49,7 @@ public class Game {
         if(checkPlayer(1))
             return Game.X;
         else if (checkPlayer(8))
-            return  Game.Y;
+            return  Game.O;
         return Game.EMPTY;
     }
 
@@ -75,23 +74,19 @@ public class Game {
     }
 
     private String getViewerData(){
-        return "{"+firstPlayer.getClientinfo()+" -:- "+secondPlayer+"}"+fieldInfo();
+        return "{"+player[0].getClientinfo()+" -:- "+player[1]+"}"+fieldInfo();
     }
 
-    private void sendInfoAboutTurns(ClientController player) throws  IOException{
-        player.sendDataToClient("TURN"+fieldInfo());
-        swapPlayer(player);
-        player.sendDataToClient("WAIT"+fieldInfo());
-        swapPlayer(player);
+    private void sendInfoAboutTurns() throws  IOException{
+        player[id].sendDataToClient("TURN"+fieldInfo());
+        swapPlayer();
+        player[id].sendDataToClient("WAIT"+fieldInfo());
+        swapPlayer();
     }
 
 
-    private void swapPlayer(ClientController player){
-        player = isPlayerFirstPlayer(player) ? secondPlayer : firstPlayer;
-    }
-
-    private boolean isPlayerFirstPlayer(ClientController player){
-        return player.equals(firstPlayer);
+    private void swapPlayer(){
+        id = id == 0 ? 1 : 0;
     }
 
     private String fieldInfo(){
