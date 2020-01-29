@@ -3,7 +3,6 @@ package com.s19215;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.util.List;
 
 public class Game {
     private static final int EMPTY = 0,
@@ -26,8 +25,7 @@ public class Game {
         while(isRunning){
             sendGameInfoOnUDP();
             sendInfoAboutTurns(player);
-            List<String> comm = player.readDataFromClient();
-            String move = comm.get(0);
+            String move = player.readDataFromClient();
             if(move.substring(0, 4).equals("MOVE")){
                 int x = Integer.parseInt(""+move.charAt(4)),
                         y = Integer.parseInt(""+move.charAt(5));
@@ -72,7 +70,7 @@ public class Game {
 
     private void sendGameInfoOnUDP() throws  IOException{
         byte[] data = getViewerData().getBytes();
-        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"),GamesController.viewerSocket.getPort());
+        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"),GamesController.viewerSocket.getLocalPort());
         GamesController.viewerSocket.send(packet);
     }
 

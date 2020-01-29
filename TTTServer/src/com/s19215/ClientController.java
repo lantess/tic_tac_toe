@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class ClientController implements Runnable {
     private int id;
@@ -27,8 +25,9 @@ public class ClientController implements Runnable {
     @Override
     public void run() {
             try {
-                while(isRunning)
-                    for (String command : readDataFromClient()) {
+                while(isRunning){
+                    String command = readDataFromClient();
+                        System.out.println(command);
                         if(command.equals("PLAY"))
                             startGame();
                         else if(command.equals("LOGOUT"))
@@ -37,19 +36,23 @@ public class ClientController implements Runnable {
                             sendClientList();
                         else
                             sendDataToClient("ERROR");
-                    }
+                }
+                sck.close();
             } catch (IOException e){
-                System.out.println("Problem z połączeniem z klientem");
+                killClient();
+                System.out.println("Problem z połączeniem z klientem "+e.getMessage());
             }
     }
 
     private void startGame() throws IOException {
         ClientController rival = gc.startGame(this);
         if(rival==null){
+            System.out.println("GRACZ 1 DOSZEDL");
             isWaiting = true;
             waitUntilGame();
         }
         else{
+            System.out.println("GRACZ 2 DOSZEDL");
             Game game = new Game(this, rival);
             game.run();
             rival.endWaiting();
@@ -59,9 +62,9 @@ public class ClientController implements Runnable {
     private void sendClientList() {
         Collection<ClientController> l = gc.getClientsList();
         String data = "";
-        l.stream()
-            .map( n -> n.getClientinfo())
-            .reduce(data, (a,b) -> a+b+"\n");
+        for(ClientController c : l){
+            data+=c.getClientinfo()+"\t";
+        }
         try {
             sendDataToClient(data);
         } catch (IOException e) {
@@ -78,15 +81,10 @@ public class ClientController implements Runnable {
         gc.deleteClient(id);
     }
 
-    public List<String> readDataFromClient() throws IOException {
-        List<String> res = new ArrayList<>();
+    public String readDataFromClient() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(sck.getInputStream()));
-        String s;
-        while((s=in.readLine())!=null){
-            res.add(s);
-        }
-        in.close();
-        return res;
+        String s = in.readLine();
+        return s;
     }
     public void waitUntilGame(){
         while(isWaiting){
@@ -94,15 +92,14 @@ public class ClientController implements Runnable {
         }
     }
     public void sendDataToClient(String data) throws IOException{
-        PrintWriter out = new PrintWriter(sck.getOutputStream());
-        out.write(data);
+        PrintWriter out = new PrintWriter(sck.getOutputStream(),true);
+        out.write(data+"\r");
         out.flush();
-        out.close();
     }
     public void endWaiting(){
         isWaiting = false;
     }
     public String getClientinfo(){
-        return "["+id+"]"+sck.getInetAddress()+":"+sck.getPort();
+        return "["+id+"]"+sck.getInetAddress().toString().substring(1)+":"+sck.getPort();
     }
 }

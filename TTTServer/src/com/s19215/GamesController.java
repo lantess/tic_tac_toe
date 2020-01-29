@@ -36,8 +36,10 @@ public class GamesController {
                 while(true){
                     s = inSocket.accept();
                     synchronized (clientList) {
-                        clientList.put(clientId,new ClientController(this,s,clientId));
+                        ClientController cc = new ClientController(this,s,clientId);
+                        clientList.put(clientId,cc);
                         clientId++;
+                        new Thread(cc).start();
                     }
                     s.setSoTimeout(600000);
                 }
@@ -50,21 +52,30 @@ public class GamesController {
     }
 
     public void deleteClient(int id){
-        clientList.remove(id);
+        synchronized (waitingClient){
+            if(waitingClient.equals(clientList.get(id)))
+                waitingClient = null;
+        }
+        synchronized (clientList) {
+            clientList.remove(id);
+        }
+
     }
 
     public Collection<ClientController> getClientsList(){
-        return clientList.values();
+        synchronized (clientList) {
+            return clientList.values();
+        }
     }
 
     public ClientController startGame(ClientController sck) {
-        if(waitingClient==null){
-            waitingClient=sck;
-            return null;
-        }else{
-            ClientController res = waitingClient;
-            waitingClient = null;
-            return res;
-        }
+            if (waitingClient == null) {
+                waitingClient = sck;
+                return null;
+            } else {
+                ClientController res = waitingClient;
+                waitingClient = null;
+                return res;
+            }
     }
 }
