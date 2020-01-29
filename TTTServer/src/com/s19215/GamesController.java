@@ -16,9 +16,9 @@ public class GamesController {
     private ClientController waitingClient;
     private Thread connListener;
 
-    public GamesController(int s) throws IOException {
+    public GamesController(int s,int u) throws IOException {
         clientId = 0;
-        viewPort = s;
+        viewPort = u;
         inSocket = new ServerSocket(s);
         clientList = new HashMap<>();
         waitingClient = null;

@@ -7,7 +7,8 @@ public class Main {
 
     public static void main(String[] args) {
         try{
-            GamesController gc = new GamesController(Integer.parseInt(args[0]));
+            GamesController gc = new GamesController(Integer.parseInt(args[0]),
+                                                    Integer.parseInt(args[1]));
             gc.start();
         } catch (IOException e){
             System.out.println("Port jest już zajęty.");
