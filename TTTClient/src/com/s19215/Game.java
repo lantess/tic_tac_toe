@@ -79,6 +79,7 @@ public class Game {
     }
 
     private void printField(String substring) {
+        System.out.println("GRA Z "+substring.substring(9));
         System.out.println("=========");
         for(int i = 0; i < 9; i++){
             System.out.print(numerToXO(substring.charAt(i),i)+" ");

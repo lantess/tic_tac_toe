@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public class GamesController {
+    private static int viewPort = -1;
     public static DatagramSocket viewerSocket = null;
     private ServerSocket inSocket;
     private int clientId;
@@ -17,12 +18,13 @@ public class GamesController {
 
     public GamesController(int s) throws IOException {
         clientId = 0;
+        viewPort = s;
         inSocket = new ServerSocket(s);
         clientList = new HashMap<>();
         waitingClient = null;
         connListener = null;
         if(viewerSocket==null)
-            viewerSocket = new DatagramSocket(s);
+            viewerSocket = new DatagramSocket();
     }
 
     public void start(){
@@ -77,5 +79,9 @@ public class GamesController {
                 waitingClient = null;
                 return res;
             }
+    }
+
+    public static int getPort(){
+        return viewPort;
     }
 }

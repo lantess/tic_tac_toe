@@ -71,18 +71,18 @@ public class Game {
 
     private void sendGameInfoOnUDP() throws  IOException{
         byte[] data = getViewerData().getBytes();
-        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"),GamesController.viewerSocket.getLocalPort());
+        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"),GamesController.getPort());
         GamesController.viewerSocket.send(packet);
     }
 
     private String getViewerData(){
-        return "{"+player[0].getClientinfo()+" -:- "+player[1]+"}"+fieldInfo();
+        return fieldInfo()+player[0].getClientinfo()+" i "+player[1].getClientinfo();
     }
 
     private void sendInfoAboutTurns() throws  IOException{
-        player[id].sendDataToClient("TURN"+fieldInfo());
+        player[id].sendDataToClient("TURN"+fieldInfo()+player[id==1?0:1].getClientinfo());
         swapPlayer();
-        player[id].sendDataToClient("WAIT"+fieldInfo());
+        player[id].sendDataToClient("WAIT"+fieldInfo()+player[id==1?0:1].getClientinfo());
         swapPlayer();
     }
 
