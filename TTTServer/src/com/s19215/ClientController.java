@@ -27,7 +27,6 @@ public class ClientController implements Runnable {
             try {
                 while(isRunning){
                     String command = readDataFromClient();
-                        System.out.println(command);
                         if(command.equals("PLAY"))
                             startGame();
                         else if(command.equals("LOGOUT"))
@@ -47,12 +46,10 @@ public class ClientController implements Runnable {
     private void startGame() throws IOException {
         ClientController rival = gc.startGame(this);
         if(rival==null){
-            System.out.println("GRACZ 1 DOSZEDL");
             isWaiting = true;
             waitUntilGame();
         }
         else{
-            System.out.println("GRACZ 2 DOSZEDL");
             Game game = new Game(this, rival);
             game.run();
             rival.endWaiting();

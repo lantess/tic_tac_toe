@@ -28,29 +28,22 @@ public class GamesController {
     }
 
     public void start(){
-        runListenerThread();
-    }
-
-    private void runListenerThread(){
-        connListener = new Thread(() -> {
-            Socket s;
-            try {
-                while(true){
-                    s = inSocket.accept();
-                    synchronized (clientList) {
-                        ClientController cc = new ClientController(this,s,clientId);
-                        clientList.put(clientId,cc);
-                        clientId++;
-                        new Thread(cc).start();
-                    }
-                    s.setSoTimeout(600000);
+        Socket s;
+        try {
+            while(true){
+                s = inSocket.accept();
+                synchronized (clientList) {
+                    ClientController cc = new ClientController(this,s,clientId);
+                    clientList.put(clientId,cc);
+                    clientId++;
+                    new Thread(cc).start();
                 }
-            } catch (IOException e){
-                System.out.println("Socket został zamknięty.");
-                throw new RuntimeException("Socket closed.");
+                s.setSoTimeout(600000);
             }
-        });
-        connListener.start();
+        } catch (IOException e){
+            System.out.println("Socket został zamknięty.");
+            throw new RuntimeException("Socket closed.");
+        }
     }
 
     public void deleteClient(int id){
