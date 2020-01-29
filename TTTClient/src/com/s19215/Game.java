@@ -71,7 +71,7 @@ public class Game {
                 if(msg.substring(0,4).equals("TURN")){
                     System.out.println("PODAJ NR POLA:");
                     int no = clientIn.nextInt();
-                    sendMessage("MOVE"+(no%3)+(no/3));
+                    sendMessage("MOVE"+(no/3)+(no%3));
                 }
                 else{
                     System.out.println("OCZEKIWANIE NA RUCH PRZECIWNIKA");
@@ -92,7 +92,7 @@ public class Game {
     private String numerToXO(char charAt) {
         if(charAt=='1')
             return "X";
-        else if(charAt=='0')
+        else if(charAt=='2')
             return "O";
         else
             return " ";
