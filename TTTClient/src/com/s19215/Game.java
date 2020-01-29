@@ -29,12 +29,13 @@ public class Game {
 
 
     public void start() throws IOException{
-        String command;
+        String command = " ";
         clientIn = new Scanner(System.in);
         while(isRunning){
-            printInitMessages();
+            if(!command.equals(""))
+                printInitMessages();
             command = clientIn.nextLine();
-            command = command.trim();
+            command = command.trim().toUpperCase();
             if(command.equals("LOGOUT"))
                 logout();
             else if(command.equals("LIST"))
@@ -45,8 +46,6 @@ public class Game {
                 } catch (IOException e){
                     System.out.println("Gra została przerwana.");
                 }
-            else
-                System.out.println("Nieprawidłowe polecenie.");
         }
         clientIn.close();
     }
@@ -56,7 +55,6 @@ public class Game {
         boolean run = true;
         while(run){
             String msg = getNextInputLine();
-            System.out.println(msg);
             if(msg.equals("INTERRUPT")) {
                 System.out.println("Gra została przerwana");
                 run = false;
@@ -83,19 +81,19 @@ public class Game {
     private void printField(String substring) {
         System.out.println("=========");
         for(int i = 0; i < 9; i++){
-            System.out.print(numerToXO(substring.charAt(i)));
+            System.out.print(numerToXO(substring.charAt(i),i)+" ");
             if((i+1)%3==0)
                 System.out.println();
         }
     }
 
-    private String numerToXO(char charAt) {
+    private String numerToXO(char charAt,int i) {
         if(charAt=='1')
             return "X";
         else if(charAt=='2')
             return "O";
         else
-            return " ";
+            return ""+i;
     }
 
     private void logout() throws IOException{

@@ -32,7 +32,7 @@ public class Game {
                     field[x][y] = id == 0 ? Game.X : Game.O;
                     int win = checkForVictory();
                     if(win!=Game.EMPTY){
-                        player[id].sendDataToClient("VICTORY");
+                        player[id].sendDataToClient(win!=-1 ? "VICTORY" : "DEFEAT");
                         swapPlayer();
                         player[id].sendDataToClient("DEFEAT");
                         isRunning = false;
@@ -50,6 +50,8 @@ public class Game {
             return Game.X;
         else if (checkPlayer(8))
             return  Game.O;
+        else if(!checkPlayer(0))
+            return -1;
         return Game.EMPTY;
     }
 
@@ -60,9 +62,9 @@ public class Game {
         for(int i = 0; i < 3; i++)
             if(field[0][i]*field[1][i]*field[2][i]==vNumber)
                 return true;
-        if(field[0][0]*field[1][1]*field[2][2]==1)
+        if(field[0][0]*field[1][1]*field[2][2]==vNumber)
             return true;
-        else if(field[0][2]*field[1][1]*field[2][0]==1)
+        else if(field[0][2]*field[1][1]*field[2][0]==vNumber)
             return true;
         return false;
     }

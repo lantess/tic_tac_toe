@@ -54,14 +54,7 @@ public class ClientController implements Runnable {
         else{
             System.out.println("GRACZ 2 DOSZEDL");
             Game game = new Game(this, rival);
-            try {
-                game.run();
-            } catch (IOException e){
-                if(!this.sck.isClosed())
-                    sendDataToClient("INTERRUPT");
-                if(!rival.sck.isClosed())
-                    sendDataToClient("INTERRUPT");
-            }
+            game.run();
             rival.endWaiting();
         }
     }
